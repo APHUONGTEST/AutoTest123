@@ -5,7 +5,12 @@ import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.concurrent.TimeUnit;
 
 public class main {
@@ -35,12 +40,25 @@ public class main {
 
 
 
-//        //user
-//        appiumDriver.findElement(By.xpath("//android.widget.EditText[@text=\"Mã nhân viên\"]")).sendKeys("87328");
+        //user
+//        MobileElement user = appiumDriver.findElement(By.xpath("//android.widget.EditText[@text=\"Mã nhân viên\"]"));
+//        user.sendKeys("87328");
+//
+//        String uservalue = user.getAttribute("text");
+////        String user = a.getAttribute("user");
+//
 //        //pass
 //        appiumDriver.findElement(By.xpath("//android.widget.EditText[@text=\"Mật khẩu\"]")).sendKeys("Erp@082021");;
 //        //Login
 //        appiumDriver.findElement(By.xpath("//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[5]/android.view.ViewGroup")).click();
+//
+//
+//        System.out.println("Login thành công");
+//
+//        sendLineNotify("Login thành công - " + "user: " + uservalue);
+
+
+
 
 //        //menu
 //        appiumDriver.findElement(By.xpath("//android.widget.TextView[@text=\"\uE601\"]")).click();
@@ -124,7 +142,12 @@ public class main {
 
         Thread.sleep(3000);
 
+
         System.out.println("Tạo đơn thành công");
+
+        sendLineNotify("Tạo đơn hàng thành công");
+
+        appiumDriver.quit();
 //        appiumDriver.notifyAll();
 //
 //        ((AndroidDriver<MobileElement>) appiumDriver).openNotifications();
@@ -185,5 +208,35 @@ public class main {
         MobileElement element = driver.findElement(MobileBy.AndroidUIAutomator(
                 "new UiScrollable(new UiSelector().scrollable(true)).scrollForward()"));
         element.click();
+    }
+
+    private static void sendLineNotify (String message){
+        try {
+            String accessToken = "ZOPHXEaUvkP4nujRBQpV1zEyhJ7d1hMqVicMfrq6AKC";
+
+            // Set the LINE Notify API endpoint
+            String apiEndpoint = "https://notify-api.line.me/api/notify";
+
+            // Create the HTTP client
+            HttpClient httpClient = HttpClient.newHttpClient();
+
+            // Create the HTTP request
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(apiEndpoint))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .POST(HttpRequest.BodyPublishers.ofString("message=" + message))
+                    .build();
+
+            // Send the HTTP request and get the response
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            // Print the response
+            System.out.println("Response Code: " + response.statusCode());
+            System.out.println("Response Body: " + response.body());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("[ERR] Error sending LINE Notify: " + e.getMessage());
+        }
     }
 }
